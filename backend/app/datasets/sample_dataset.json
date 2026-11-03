@@ -1,0 +1,37 @@
+[
+  {
+    "test_id": "TC001",
+    "category": "positive",
+    "question": "What is Python?",
+    "expected_answer": "Python is a programming language.",
+    "scenario": "correct"
+  },
+  {
+    "test_id": "TC002",
+    "category": "positive",
+    "question": "What is an API?",
+    "expected_answer": "An API allows software applications to communicate.",
+    "scenario": "correct"
+  },
+  {
+    "test_id": "TC003",
+    "category": "negative",
+    "question": "What is database indexing?",
+    "expected_answer": "Database indexing improves data retrieval speed.",
+    "scenario": "incorrect"
+  },
+  {
+    "test_id": "TC004",
+    "category": "edge",
+    "question": "Explain cloud computing briefly.",
+    "expected_answer": "Cloud computing provides computing services over the internet.",
+    "scenario": "empty"
+  },
+  {
+    "test_id": "TC005",
+    "category": "positive",
+    "question": "What is machine learning?",
+    "expected_answer": "Machine learning enables computers to learn from data.",
+    "scenario": "correct"
+  }
+]
