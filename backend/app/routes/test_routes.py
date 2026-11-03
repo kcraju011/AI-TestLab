@@ -1,7 +1,7 @@
 import time
 import uuid
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.models.schemas import (
     TestRequest,
@@ -9,6 +9,11 @@ from app.models.schemas import (
 )
 
 from app.services.mock_llm import MockLLMService
+
+from app.services.openai_llm import (
+    OpenAILLMService,
+    LLMProviderError
+)
 
 from app.evaluators.basic_evaluator import BasicEvaluator
 
@@ -18,7 +23,7 @@ router = APIRouter(
     tags=["AI Testing"]
 )
 
-llm_service = MockLLMService()
+mock_service = MockLLMService()
 
 evaluator = BasicEvaluator()
 
@@ -28,28 +33,60 @@ def run_test(request: TestRequest):
 
     start_time = time.perf_counter()
 
-    actual_answer = llm_service.generate_response(
-        question=request.question,
-        expected_answer=request.expected_answer,
-        scenario=request.scenario
-    )
+    try:
 
-    evaluation = evaluator.evaluate(
-        expected_answer=request.expected_answer,
-        actual_answer=actual_answer
-    )
+        if request.provider == "mock":
 
-    execution_time = (
-        time.perf_counter() - start_time
-    ) * 1000
+            result = mock_service.generate_response(
+                question=request.question,
+                expected_answer=request.expected_answer,
+                scenario=request.scenario
+            )
 
-    return TestResponse(
-        test_id=str(uuid.uuid4()),
-        question=request.question,
-        expected_answer=request.expected_answer,
-        actual_answer=actual_answer,
-        score=evaluation["score"],
-        status=evaluation["status"],
-        execution_time_ms=round(execution_time, 2),
-        message="AI test executed successfully"
-    )
+        elif request.provider == "openai":
+
+            openai_service = OpenAILLMService()
+
+            result = openai_service.generate_response(
+                question=request.question
+            )
+
+        else:
+
+            raise HTTPException(
+                status_code=400,
+                detail="Unsupported LLM provider"
+            )
+
+        actual_answer = result["text"]
+
+        evaluation = evaluator.evaluate(
+            expected_answer=request.expected_answer,
+            actual_answer=actual_answer
+        )
+
+        execution_time = (
+            time.perf_counter() - start_time
+        ) * 1000
+
+        return TestResponse(
+            test_id=str(uuid.uuid4()),
+            question=request.question,
+            expected_answer=request.expected_answer,
+            actual_answer=actual_answer,
+            score=evaluation["score"],
+            status=evaluation["status"],
+            execution_time_ms=round(execution_time, 2),
+            provider=result["provider"],
+            model=result["model"],
+            input_tokens=result["input_tokens"],
+            output_tokens=result["output_tokens"],
+            message="AI test executed successfully"
+        )
+
+    except LLMProviderError as error:
+
+        raise HTTPException(
+            status_code=502,
+            detail=str(error)
+        ) from error

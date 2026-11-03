@@ -1,19 +1,34 @@
-class MockLLMService:
+from app.services.base_llm import BaseLLMProvider
+
+
+class MockLLMService(BaseLLMProvider):
 
     def generate_response(
         self,
         question: str,
-        expected_answer: str,
+        expected_answer: str = "",
         scenario: str = "correct"
-    ) -> str:
+    ) -> dict:
 
         if scenario == "correct":
-            return expected_answer
+            answer = expected_answer
 
         elif scenario == "incorrect":
-            return "I cannot provide accurate information about this topic."
+            answer = (
+                "I cannot provide accurate information "
+                "about this topic."
+            )
 
         elif scenario == "empty":
-            return ""
+            answer = ""
 
-        return "Unknown response"
+        else:
+            answer = "Unknown response"
+
+        return {
+            "text": answer,
+            "provider": "mock",
+            "model": "mock-model",
+            "input_tokens": 0,
+            "output_tokens": 0
+        }
