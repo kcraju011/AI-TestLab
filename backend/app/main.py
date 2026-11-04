@@ -4,6 +4,7 @@ from app.routes.test_routes import router as test_router
 from app.routes.batch_routes import router as batch_router
 from app.routes.evaluation_routes import router as evaluation_router
 from app.routes.rag_routes import router as rag_router
+from app.routes.security_routes import router as security_router
 
 
 app = FastAPI(
@@ -20,6 +21,7 @@ app.include_router(test_router)
 app.include_router(batch_router)
 app.include_router(evaluation_router)
 app.include_router(rag_router)
+app.include_router(security_router)
 
 
 @app.get("/")
