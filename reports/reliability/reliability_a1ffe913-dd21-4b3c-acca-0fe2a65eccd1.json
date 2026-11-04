@@ -1,0 +1,16 @@
+{
+    "report_id": "a1ffe913-dd21-4b3c-acca-0fe2a65eccd1",
+    "created_at": "2026-11-04T14:16:21.364465+00:00",
+    "test_type": "reliability",
+    "results": {
+        "total_requests": 3,
+        "successful_requests": 3,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_latency_ms": 15.77,
+        "min_latency_ms": 14.19,
+        "max_latency_ms": 17.22,
+        "p95_latency_ms": 17.22,
+        "status": "PASS"
+    }
+}

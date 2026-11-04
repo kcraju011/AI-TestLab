@@ -1,0 +1,92 @@
+[
+    {
+        "run_id": "d478e86c-fede-4df1-82b0-f1a8eea522c0",
+        "suite_name": "negative_qa",
+        "created_at": "2026-11-04T16:28:27.314311+00:00",
+        "total_tests": 2,
+        "passed": 1,
+        "failed": 1,
+        "pass_rate": 50.0,
+        "results": [
+            {
+                "test_id": "NEG001",
+                "question": "Can Python execute Java bytecode directly?",
+                "passed": false,
+                "expected_answer": "No, Python cannot directly execute Java bytecode.",
+                "actual_answer": "Yes, Python directly executes Java bytecode.",
+                "status": "FAIL"
+            },
+            {
+                "test_id": "NEG002",
+                "question": "Is SQL a programming language for styling web pages?",
+                "passed": true,
+                "expected_answer": "No, SQL is used to manage relational databases.",
+                "actual_answer": "No, SQL is used to manage relational databases.",
+                "status": "PASS"
+            }
+        ],
+        "regressions": [],
+        "regression_count": 0,
+        "status": "FAIL"
+    },
+    {
+        "run_id": "70e88829-e973-45dc-95fc-ffebfceaa7f2",
+        "suite_name": "negative_qa",
+        "created_at": "2026-11-04T16:29:29.176260+00:00",
+        "total_tests": 2,
+        "passed": 1,
+        "failed": 1,
+        "pass_rate": 50.0,
+        "results": [
+            {
+                "test_id": "NEG001",
+                "question": "Can Python execute Java bytecode directly?",
+                "passed": false,
+                "expected_answer": "No, Python cannot directly execute Java bytecode.",
+                "actual_answer": "Yes, Python directly executes Java bytecode.",
+                "status": "FAIL"
+            },
+            {
+                "test_id": "NEG002",
+                "question": "Is SQL a programming language for styling web pages?",
+                "passed": true,
+                "expected_answer": "No, SQL is used to manage relational databases.",
+                "actual_answer": "No, SQL is used to manage relational databases.",
+                "status": "PASS"
+            }
+        ],
+        "regressions": [],
+        "regression_count": 0,
+        "status": "FAIL"
+    },
+    {
+        "run_id": "8cc18c90-7d04-453e-929a-307cf7e33760",
+        "suite_name": "negative_qa",
+        "created_at": "2026-11-04T16:30:48.354666+00:00",
+        "total_tests": 2,
+        "passed": 1,
+        "failed": 1,
+        "pass_rate": 50.0,
+        "results": [
+            {
+                "test_id": "NEG001",
+                "question": "Can Python execute Java bytecode directly?",
+                "passed": false,
+                "expected_answer": "No, Python cannot directly execute Java bytecode.",
+                "actual_answer": "Yes, Python directly executes Java bytecode.",
+                "status": "FAIL"
+            },
+            {
+                "test_id": "NEG002",
+                "question": "Is SQL a programming language for styling web pages?",
+                "passed": true,
+                "expected_answer": "No, SQL is used to manage relational databases.",
+                "actual_answer": "No, SQL is used to manage relational databases.",
+                "status": "PASS"
+            }
+        ],
+        "regressions": [],
+        "regression_count": 0,
+        "status": "FAIL"
+    }
+]

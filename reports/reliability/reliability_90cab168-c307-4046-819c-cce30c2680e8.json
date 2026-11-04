@@ -1,0 +1,16 @@
+{
+    "report_id": "90cab168-c307-4046-819c-cce30c2680e8",
+    "created_at": "2026-11-04T14:16:48.510998+00:00",
+    "test_type": "reliability",
+    "results": {
+        "total_requests": 3,
+        "successful_requests": 3,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_latency_ms": 15.13,
+        "min_latency_ms": 13.54,
+        "max_latency_ms": 16.34,
+        "p95_latency_ms": 16.34,
+        "status": "PASS"
+    }
+}
