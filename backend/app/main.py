@@ -6,7 +6,10 @@ from app.routes.evaluation_routes import router as evaluation_router
 from app.routes.rag_routes import router as rag_router
 from app.routes.security_routes import router as security_router
 from app.routes.reliability_routes import router as reliability_router
-from app.routes.regression_routes import router as regression_router
+from app.routes.regression_routes import router as regression_router 
+from app.routes.dashboard_routes import router as dashboard_router
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI(
     title="AI-TestLab",
@@ -15,6 +18,16 @@ app = FastAPI(
         "Testing Platform"
     ),
     version="1.0.0"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["GET"],
+    allow_headers=["*"]
 )
 
 
@@ -25,6 +38,7 @@ app.include_router(rag_router)
 app.include_router(security_router)
 app.include_router(reliability_router)
 app.include_router(regression_router)
+app.include_router(dashboard_router)
 
 
 
