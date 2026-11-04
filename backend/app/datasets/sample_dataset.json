@@ -4,6 +4,10 @@
     "category": "positive",
     "question": "What is Python?",
     "expected_answer": "Python is a programming language.",
+    "context": "Python is a high-level, general-purpose programming language.",
+    "retrieval_context": [
+      "Python is a high-level, general-purpose programming language."
+    ],
     "scenario": "correct"
   },
   {
@@ -11,6 +15,10 @@
     "category": "positive",
     "question": "What is an API?",
     "expected_answer": "An API allows software applications to communicate.",
+    "context": "An API is a set of rules that allows different software applications to communicate.",
+    "retrieval_context": [
+      "An API is a set of rules that allows different software applications to communicate."
+    ],
     "scenario": "correct"
   },
   {
@@ -18,6 +26,10 @@
     "category": "negative",
     "question": "What is database indexing?",
     "expected_answer": "Database indexing improves data retrieval speed.",
+    "context": "A database index is a data structure that helps retrieve records efficiently.",
+    "retrieval_context": [
+      "A database index is a data structure that helps retrieve records efficiently."
+    ],
     "scenario": "incorrect"
   },
   {
@@ -25,6 +37,10 @@
     "category": "edge",
     "question": "Explain cloud computing briefly.",
     "expected_answer": "Cloud computing provides computing services over the internet.",
+    "context": "Cloud computing provides computing resources and services over the internet.",
+    "retrieval_context": [
+      "Cloud computing provides computing resources and services over the internet."
+    ],
     "scenario": "empty"
   },
   {
@@ -32,6 +48,10 @@
     "category": "positive",
     "question": "What is machine learning?",
     "expected_answer": "Machine learning enables computers to learn from data.",
+    "context": "Machine learning is a field of AI that enables systems to learn patterns from data.",
+    "retrieval_context": [
+      "Machine learning is a field of AI that enables systems to learn patterns from data."
+    ],
     "scenario": "correct"
   }
 ]

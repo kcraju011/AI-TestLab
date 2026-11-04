@@ -15,6 +15,11 @@ class Settings:
         "gpt-4.1-mini"
     )
 
+    DEEPEVAL_MODEL = os.getenv(
+        "DEEPEVAL_MODEL",
+        "gpt-4.1-mini"
+    )
+
     LLM_TIMEOUT_SECONDS = float(
         os.getenv("LLM_TIMEOUT_SECONDS", "20")
     )
