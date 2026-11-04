@@ -1,0 +1,73 @@
+{
+    "batch_id": "bf621051-92e2-49ea-81b3-e40879bc42b0",
+    "provider": "mock",
+    "summary": {
+        "total_tests": 5,
+        "passed": 3,
+        "failed": 2,
+        "average_score": 0.6,
+        "pass_rate": 60.0
+    },
+    "results": [
+        {
+            "test_id": "TC001",
+            "category": "positive",
+            "question": "What is Python?",
+            "expected_answer": "Python is a programming language.",
+            "actual_answer": "Python is a programming language.",
+            "score": 1.0,
+            "status": "PASS",
+            "execution_time_ms": 0.06,
+            "provider": "mock",
+            "model": "mock-model"
+        },
+        {
+            "test_id": "TC002",
+            "category": "positive",
+            "question": "What is an API?",
+            "expected_answer": "An API allows software applications to communicate.",
+            "actual_answer": "An API allows software applications to communicate.",
+            "score": 1.0,
+            "status": "PASS",
+            "execution_time_ms": 0.02,
+            "provider": "mock",
+            "model": "mock-model"
+        },
+        {
+            "test_id": "TC003",
+            "category": "negative",
+            "question": "What is database indexing?",
+            "expected_answer": "Database indexing improves data retrieval speed.",
+            "actual_answer": "I cannot provide accurate information about this topic.",
+            "score": 0.0,
+            "status": "FAIL",
+            "execution_time_ms": 0.05,
+            "provider": "mock",
+            "model": "mock-model"
+        },
+        {
+            "test_id": "TC004",
+            "category": "edge",
+            "question": "Explain cloud computing briefly.",
+            "expected_answer": "Cloud computing provides computing services over the internet.",
+            "actual_answer": "",
+            "score": 0.0,
+            "status": "FAIL",
+            "execution_time_ms": 0.02,
+            "provider": "mock",
+            "model": "mock-model"
+        },
+        {
+            "test_id": "TC005",
+            "category": "positive",
+            "question": "What is machine learning?",
+            "expected_answer": "Machine learning enables computers to learn from data.",
+            "actual_answer": "Machine learning enables computers to learn from data.",
+            "score": 1.0,
+            "status": "PASS",
+            "execution_time_ms": 0.02,
+            "provider": "mock",
+            "model": "mock-model"
+        }
+    ]
+}
