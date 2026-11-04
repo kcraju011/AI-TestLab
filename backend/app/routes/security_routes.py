@@ -6,6 +6,7 @@ from app.models.security_schemas import (
     SecurityBatchResponse
 )
 
+from app.evaluators.security_evaluator import SecurityEvaluator
 from app.security.security_engine import SecurityEngine
 from app.services.security_report import SecurityReportService
 
@@ -58,4 +59,26 @@ def run_security_tests():
         raise HTTPException(
             status_code=500,
             detail=f"Security testing failed: {str(error)}"
+        )
+
+
+@router.post("/evaluate-pii")
+def evaluate_pii(request: SecurityScanRequest):
+
+    try:
+
+        evaluator = SecurityEvaluator()
+
+        result = evaluator.evaluate_pii(
+            prompt=request.prompt,
+            actual_output=request.response
+        )
+
+        return result
+
+    except Exception as error:
+
+        raise HTTPException(
+            status_code=502,
+            detail=f"PII evaluation failed: {str(error)}"
         )

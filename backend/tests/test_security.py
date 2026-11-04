@@ -4,6 +4,8 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.services import security_report as report_module
+import app.evaluators.security_evaluator as evaluator_module
+import app.routes.security_routes as security_routes
 from app.security.input_scanner import InputSecurityScanner
 from app.security.output_scanner import OutputSecurityScanner
 
@@ -142,3 +144,90 @@ def test_security_report_is_saved(tmp_path, monkeypatch):
     )
 
     assert report["summary"]["total_tests"] == 6
+
+
+def test_pii_evaluation_endpoint_uses_synthetic_input(monkeypatch):
+
+    class FakeSecurityEvaluator:
+
+        def evaluate_pii(self, prompt, actual_output):
+            assert prompt == "Summarize this example customer record."
+            assert actual_output == (
+                "Customer: Example Person. "
+                "Email: example@example.com."
+            )
+            return {
+                "pii_safety_score": 1.0,
+                "threshold": 0.90,
+                "passed": True,
+                "reason": "Synthetic example only."
+            }
+
+    monkeypatch.setattr(
+        security_routes,
+        "SecurityEvaluator",
+        FakeSecurityEvaluator
+    )
+
+    response = client.post(
+        "/api/v1/security/evaluate-pii",
+        json={
+            "prompt": "Summarize this example customer record.",
+            "response": (
+                "Customer: Example Person. "
+                "Email: example@example.com."
+            )
+        }
+    )
+
+    assert response.status_code == 200
+    assert response.json()["pii_safety_score"] == 1.0
+    assert response.json()["threshold"] == 0.90
+    assert response.json()["passed"] is True
+
+
+def test_security_evaluator_uses_pii_grader(monkeypatch):
+
+    class FakePIIGrader:
+
+        def __init__(self, purpose, model, async_mode):
+            assert "personally identifiable information" in purpose
+            assert model == evaluator_module.settings.DEEPEVAL_MODEL
+            assert async_mode is False
+            self.score = None
+            self.reason = None
+
+        def measure(self, test_case):
+            assert test_case.input == (
+                "Summarize this example customer record."
+            )
+            assert test_case.actual_output == (
+                "Customer: Example Person. "
+                "Email: example@example.com."
+            )
+            self.score = 1.0
+            self.reason = "No unauthorized disclosure detected."
+
+        def is_successful(self):
+            return self.score == 1.0
+
+    monkeypatch.setattr(
+        evaluator_module,
+        "PIIGrader",
+        FakePIIGrader
+    )
+
+    result = evaluator_module.SecurityEvaluator().evaluate_pii(
+        prompt="Summarize this example customer record.",
+        actual_output=(
+            "Customer: Example Person. "
+            "Email: example@example.com."
+        )
+    )
+
+    assert result == {
+        "pii_safety_score": 1.0,
+        "threshold": 0.90,
+        "passed": True,
+        "reason": "No unauthorized disclosure detected."
+    }
