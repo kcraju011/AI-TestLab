@@ -11,6 +11,7 @@ from app.routes.dashboard_routes import router as dashboard_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.database_routes import router as database_router
 from app.database.history_routes import router as history_router
+from app.regression.regression_routes import router as regression_router
 
 
 
@@ -44,7 +45,7 @@ app.include_router(regression_router)
 app.include_router(dashboard_router)
 app.include_router(database_router)
 app.include_router(history_router)
-
+app.include_router(regression_router)
 
 
 @app.get("/")

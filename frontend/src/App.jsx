@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import RegressionHistory from "./components/RegressionHistory";
 import {
   ResponsiveContainer,
   BarChart,
@@ -362,6 +363,8 @@ function App() {
                 )}
               </div>
             </section>
+
+            <RegressionHistory />
 
             <section className="panel data-notes">
               <h3>Data availability</h3>

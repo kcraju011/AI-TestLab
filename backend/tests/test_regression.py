@@ -1,128 +1,138 @@
 import pytest
-from fastapi.testclient import TestClient
 
-from app.main import app
+from app.regression.schemas import (
+    ModelTestCase,
+    ModelEvaluation,
+    RegressionRequest,
+)
 from app.regression.regression_engine import RegressionEngine
-from app.regression.regression_report import RegressionReport
 
 
-client = TestClient(app)
+def make_request(baseline, candidate, threshold=0.10):
 
-
-def test_normalization():
-    engine = RegressionEngine()
-
-    assert engine.normalize("  HELLO   WORLD ") == "hello world"
-
-
-def test_matching_answer_passes():
-    engine = RegressionEngine()
-
-    result = engine.evaluate_case({
-        "test_id": "T001",
-        "question": "What is Python?",
-        "expected_answer": "Python is a language.",
-        "actual_answer": "  Python is a language. "
-    })
-
-    assert result["passed"] is True
-    assert result["status"] == "PASS"
-
-
-def test_different_answer_fails():
-    engine = RegressionEngine()
-
-    result = engine.evaluate_case({
-        "test_id": "T002",
-        "question": "What is Python?",
-        "expected_answer": "Python is a language.",
-        "actual_answer": "Python is a database."
-    })
-
-    assert result["passed"] is False
-    assert result["status"] == "FAIL"
-
-
-def test_regression_detection():
-    engine = RegressionEngine()
-
-    previous = {
-        "results": [
-            {"test_id": "T001", "passed": True},
-            {"test_id": "T002", "passed": True}
-        ]
-    }
-
-    current = {
-        "results": [
-            {"test_id": "T001", "passed": False},
-            {"test_id": "T002", "passed": True}
-        ]
-    }
-
-    regressions = engine.detect_regressions(previous, current)
-
-    assert regressions == ["T001"]
-
-
-def test_existing_failure_is_not_new_regression():
-    engine = RegressionEngine()
-
-    previous = {
-        "results": [
-            {"test_id": "T001", "passed": False}
-        ]
-    }
-
-    current = {
-        "results": [
-            {"test_id": "T001", "passed": False}
-        ]
-    }
-
-    assert engine.detect_regressions(previous, current) == []
-
-
-def test_unknown_suite_returns_404():
-    response = client.post(
-        "/api/v1/regression/run",
-        json={"suite_name": "does_not_exist"}
+    return RegressionRequest(
+        baseline=ModelEvaluation(
+            model_name="AI-TestLab",
+            model_version="v1",
+            test_cases=[
+                ModelTestCase(**case)
+                for case in baseline
+            ],
+        ),
+        candidate=ModelEvaluation(
+            model_name="AI-TestLab",
+            model_version="v2",
+            test_cases=[
+                ModelTestCase(**case)
+                for case in candidate
+            ],
+        ),
+        score_drop_threshold=threshold,
     )
 
-    assert response.status_code == 404
+
+def test_detect_score_regression():
+
+    request = make_request(
+        baseline=[
+            {"test_id": "TC001", "score": 0.95, "status": "PASS"},
+        ],
+        candidate=[
+            {"test_id": "TC001", "score": 0.60, "status": "PASS"},
+        ],
+    )
+
+    result = RegressionEngine.compare(request)
+
+    assert result.regression_count == 1
+    assert result.status == "REGRESSION"
+    assert result.score_change == -0.35
 
 
-def test_suites_endpoint():
-    response = client.get("/api/v1/regression/suites")
+def test_detect_pass_to_fail():
 
-    assert response.status_code == 200
+    request = make_request(
+        baseline=[
+            {"test_id": "TC001", "score": 0.90, "status": "PASS"},
+        ],
+        candidate=[
+            {"test_id": "TC001", "score": 0.85, "status": "FAIL"},
+        ],
+    )
 
-    names = [item["suite_name"] for item in response.json()["suites"]]
+    result = RegressionEngine.compare(request)
 
-    assert "basic_qa" in names
-    assert "negative_qa" in names
-
-
-def test_report_history_and_regression(tmp_path):
-    service = RegressionReport(report_dir=tmp_path)
-
-    first = service.run("basic_qa")
-    second = service.run("basic_qa")
-
-    assert first["total_tests"] == 3
-    assert first["passed"] == 3
-    assert first["status"] == "PASS"
-
-    assert second["total_tests"] == 3
-    assert second["regression_count"] == 0
-
-    history_file = tmp_path / "basic_qa_history.json"
-
-    assert history_file.exists()
+    assert result.regression_count == 1
 
 
-def test_report_rejects_unknown_suite(tmp_path):
-    service = RegressionReport(report_dir=tmp_path)
+def test_detect_improvement():
+
+    request = make_request(
+        baseline=[
+            {"test_id": "TC001", "score": 0.60, "status": "PASS"},
+        ],
+        candidate=[
+            {"test_id": "TC001", "score": 0.90, "status": "PASS"},
+        ],
+    )
+
+    result = RegressionEngine.compare(request)
+
+    assert result.improved_count == 1
+    assert result.regression_count == 0
+    assert result.status == "PASS"
+
+
+def test_no_regression_with_small_score_drop():
+
+    request = make_request(
+        baseline=[
+            {"test_id": "TC001", "score": 0.90, "status": "PASS"},
+        ],
+        candidate=[
+            {"test_id": "TC001", "score": 0.85, "status": "PASS"},
+        ],
+    )
+
+    result = RegressionEngine.compare(request)
+
+    assert result.regression_count == 0
+    assert result.status == "PASS"
+
+
+def test_no_matching_test_ids():
+
+    request = make_request(
+        baseline=[
+            {"test_id": "TC001", "score": 0.90, "status": "PASS"},
+        ],
+        candidate=[
+            {"test_id": "TC002", "score": 0.90, "status": "PASS"},
+        ],
+    )
 
     with pytest.raises(ValueError):
-        service.run("unknown_suite")
+        RegressionEngine.compare(request)
+
+
+def test_compare_multiple_test_cases():
+
+    request = make_request(
+        baseline=[
+            {"test_id": "TC001", "score": 0.90, "status": "PASS"},
+            {"test_id": "TC002", "score": 0.70, "status": "PASS"},
+            {"test_id": "TC003", "score": 0.80, "status": "PASS"},
+        ],
+        candidate=[
+            {"test_id": "TC001", "score": 0.50, "status": "FAIL"},
+            {"test_id": "TC002", "score": 0.90, "status": "PASS"},
+            {"test_id": "TC003", "score": 0.80, "status": "PASS"},
+        ],
+    )
+
+    result = RegressionEngine.compare(request)
+
+    assert result.total_compared == 3
+    assert result.regression_count == 1
+    assert result.improved_count == 1
+    assert result.unchanged_count == 1
