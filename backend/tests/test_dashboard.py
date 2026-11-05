@@ -22,6 +22,26 @@ def test_dashboard_endpoint():
     assert "regression_history" in data
 
 
+def test_dashboard_allows_vite_port_5174():
+    response = client.get(
+        "/api/v1/dashboard/summary",
+        headers={"Origin": "http://localhost:5174"},
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5174"
+
+
+def test_dashboard_allows_docker_frontend_port_8081():
+    response = client.get(
+        "/api/v1/dashboard/summary",
+        headers={"Origin": "http://localhost:8081"},
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:8081"
+
+
 def test_find_batch_metrics():
     report = {
         "summary": {

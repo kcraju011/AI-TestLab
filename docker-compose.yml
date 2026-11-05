@@ -1,3 +1,4 @@
+
 services:
   postgres:
     image: postgres:16
@@ -6,16 +7,51 @@ services:
     environment:
       POSTGRES_DB: ai_testlab
       POSTGRES_USER: ai_testlab_user
-      POSTGRES_PASSWORD: change_this_local_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5434:5432"
     volumes:
       - ai_testlab_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ai_testlab_user -d ai_testlab"]
+      test:
+        - CMD-SHELL
+        - pg_isready -U ai_testlab_user -d ai_testlab
       interval: 5s
       timeout: 5s
       retries: 10
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai-testlab-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://ai_testlab_user:${POSTGRES_PASSWORD}@postgres:5432/ai_testlab
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./reports:/app/reports
+      - ai_testlab_chroma_data:/app/app/rag/chroma_db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+    container_name: ai-testlab-frontend
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
 volumes:
   ai_testlab_postgres_data:
+  ai_testlab_chroma_data:
