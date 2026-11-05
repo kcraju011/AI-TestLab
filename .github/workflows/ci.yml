@@ -14,6 +14,8 @@ jobs:
   backend-tests:
     name: Backend automated tests
     runs-on: ubuntu-24.04
+    env:
+      DATABASE_URL: sqlite:///./ci-test.db
 
     defaults:
       run:
