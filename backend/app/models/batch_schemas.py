@@ -33,3 +33,4 @@ class BatchRunResponse(BaseModel):
     summary: BatchSummary
     results: List[BatchTestResult]
     report_file: str
+    database_run_id: int

@@ -1,5 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
+from app.database.session import get_db
+from app.database.batch_persistence import save_batch_result
 from app.models.batch_schemas import (
     BatchRunRequest,
     BatchRunResponse
@@ -15,7 +18,10 @@ router = APIRouter(
 
 
 @router.post("/run", response_model=BatchRunResponse)
-def run_batch(request: BatchRunRequest):
+def run_batch(
+    request: BatchRunRequest,
+    db: Session = Depends(get_db)
+):
 
     try:
         runner = BatchRunner()
@@ -24,7 +30,12 @@ def run_batch(request: BatchRunRequest):
             provider=request.provider
         )
 
-        return result
+        saved_run = save_batch_result(db, result)
+
+        return {
+            **result,
+            "database_run_id": saved_run.id
+        }
 
     except FileNotFoundError as error:
         raise HTTPException(
