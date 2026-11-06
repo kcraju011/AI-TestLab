@@ -1,15 +1,12 @@
 import json
 import uuid
 
-from pathlib import Path
-
 from app.security.attack_dataset import SECURITY_TEST_CASES
 from app.security.security_engine import SecurityEngine
+from app.core.paths import BACKEND_DIR
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-REPORTS_DIR = PROJECT_ROOT / "reports"
+REPORTS_DIR = BACKEND_DIR / "reports"
 
 
 class SecurityReportService:

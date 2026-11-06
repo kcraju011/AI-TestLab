@@ -3,10 +3,10 @@ from pathlib import Path
 
 from app.regression.regression_engine import RegressionEngine
 from app.regression.test_suites import TEST_SUITES
+from app.core.paths import BACKEND_DIR
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_REPORT_DIR = PROJECT_ROOT / "reports" / "regression"
+DEFAULT_REPORT_DIR = BACKEND_DIR / "reports" / "regression"
 
 
 class RegressionReport:

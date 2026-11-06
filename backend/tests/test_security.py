@@ -1,5 +1,6 @@
 import json
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -11,6 +12,15 @@ from app.security.output_scanner import OutputSecurityScanner
 
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def isolate_security_report_side_effects(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        report_module,
+        "REPORTS_DIR",
+        tmp_path
+    )
 
 
 def test_prompt_injection_detection():

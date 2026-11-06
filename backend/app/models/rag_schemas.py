@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 
 from pydantic import BaseModel, Field
 
@@ -21,12 +21,15 @@ class RAGRequest(BaseModel):
         le=10
     )
 
+    provider: Literal["mock", "openai"] = "openai"
+
 
 class RAGResponse(BaseModel):
     question: str
     answer: str
     retrieved_context: List[str]
     retrieved_chunks: int
+    provider: Literal["mock", "openai"]
 
 
 class RAGEvaluationRequest(BaseModel):

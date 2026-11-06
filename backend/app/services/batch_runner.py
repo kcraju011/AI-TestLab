@@ -2,24 +2,14 @@ import json
 import time
 import uuid
 
-from pathlib import Path
-
 from app.services.mock_llm import MockLLMService
 from app.services.openai_llm import OpenAILLMService
 from app.evaluators.basic_evaluator import BasicEvaluator
+from app.core.paths import BACKEND_DIR
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-DATASET_PATH = (
-    PROJECT_ROOT
-    / "backend"
-    / "app"
-    / "datasets"
-    / "sample_dataset.json"
-)
-
-REPORTS_DIR = PROJECT_ROOT / "reports"
+DATASET_PATH = BACKEND_DIR / "app" / "datasets" / "sample_dataset.json"
+REPORTS_DIR = BACKEND_DIR / "reports"
 
 
 class BatchRunner:

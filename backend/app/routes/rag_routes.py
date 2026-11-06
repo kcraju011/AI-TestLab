@@ -48,7 +48,8 @@ def ask_question(request: RAGRequest):
 
         result = service.ask(
             question=request.question,
-            top_k=request.top_k
+            top_k=request.top_k,
+            provider=request.provider
         )
 
         return result

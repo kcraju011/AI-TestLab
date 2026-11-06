@@ -2,12 +2,10 @@ from typing import List
 
 import chromadb
 
-from pathlib import Path
+from app.core.paths import BACKEND_DIR
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-CHROMA_PATH = PROJECT_ROOT / "backend" / "chroma_db"
+CHROMA_PATH = BACKEND_DIR / "app" / "rag" / "chroma_db"
 
 
 class VectorStore:

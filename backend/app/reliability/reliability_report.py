@@ -1,13 +1,12 @@
 import json
-from pathlib import Path
 from uuid import uuid4
 from datetime import datetime, timezone
 
 from app.reliability.reliability_engine import ReliabilityEngine
+from app.core.paths import BACKEND_DIR
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-REPORTS_DIR = PROJECT_ROOT / "reports" / "reliability"
+REPORTS_DIR = BACKEND_DIR / "reports" / "reliability"
 
 
 class ReliabilityReport:

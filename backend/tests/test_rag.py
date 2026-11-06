@@ -1,6 +1,9 @@
 import pytest
 
 from app.rag.chunker import split_text
+from app.core.paths import BACKEND_DIR
+from app.models.rag_schemas import RAGRequest
+from app.services.rag_service import DOCUMENTS_DIR, RAGService
 
 
 def test_split_text_creates_chunks():
@@ -55,3 +58,32 @@ def test_overlap_must_be_smaller_than_chunk_size():
             chunk_size=5,
             overlap=5
         )
+
+
+def test_rag_documents_path_resolves_inside_backend():
+    assert DOCUMENTS_DIR == BACKEND_DIR / "app" / "rag" / "documents"
+
+
+def test_mock_rag_answer_uses_retrieved_context_without_api_key(monkeypatch):
+    from app.core import config
+
+    monkeypatch.setattr(config.settings, "OPENAI_API_KEY", None)
+    service = RAGService.__new__(RAGService)
+    service.retrieve = lambda question, top_k: [
+        "Employees receive 20 annual paid leave days per calendar year."
+    ]
+
+    result = service.ask(
+        question="How many annual paid leave days are provided?",
+        provider="mock"
+    )
+
+    assert result["provider"] == "mock"
+    assert result["retrieved_chunks"] == 1
+    assert "20 annual paid leave days" in result["answer"]
+
+
+def test_rag_request_accepts_mock_provider():
+    request = RAGRequest(question="What is the leave policy?", provider="mock")
+
+    assert request.provider == "mock"

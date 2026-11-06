@@ -1,10 +1,10 @@
 import json
-from pathlib import Path
 from statistics import mean
 
+from app.core.paths import BACKEND_DIR
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-REPORTS_DIR = PROJECT_ROOT / "reports"
+
+REPORTS_DIR = BACKEND_DIR / "reports"
 
 
 def read_json_files(pattern: str) -> list:
@@ -80,6 +80,7 @@ class DashboardService:
                 "total": metrics.get("total_tests", 0),
                 "passed": metrics.get("passed", 0),
                 "failed": metrics.get("failed", 0),
+                "modified_at": path.stat().st_mtime_ns,
                 "status": (
                     "PASS" if metrics.get("failed", 0) == 0 else "FAIL"
                 )
@@ -112,6 +113,7 @@ class DashboardService:
                 "total": metrics.get("total_tests", 0),
                 "passed": metrics.get("passed", 0),
                 "failed": metrics.get("failed", 0),
+                "modified_at": path.stat().st_mtime_ns,
                 "status": (
                     "PASS" if metrics.get("failed", 0) == 0 else "FAIL"
                 )
@@ -168,6 +170,10 @@ class DashboardService:
             passed_tests / total_tests * 100
             if total_tests else 0
         )
+        recent_runs.sort(key=lambda run: run["modified_at"])
+        latest_runs = recent_runs[-10:][::-1]
+        for run in latest_runs:
+            del run["modified_at"]
 
         return {
             "total_tests": total_tests,
@@ -182,7 +188,7 @@ class DashboardService:
             ),
             "regression_runs": regression_runs,
             "regression_count": regression_count,
-            "recent_runs": recent_runs[-10:][::-1],
+            "recent_runs": latest_runs,
             "regression_history": regression_history[-10:][::-1],
             "data_notes": notes
         }

@@ -1,36 +1,22 @@
 from typing import List
 
-from pathlib import Path
-
 from openai import OpenAI
 
 from app.rag.chunker import split_text
 from app.rag.embedding import EmbeddingService
 from app.rag.vector_store import VectorStore
 from app.core.config import settings
+from app.core.paths import BACKEND_DIR
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-DOCUMENTS_DIR = (
-    PROJECT_ROOT / "backend" / "app" / "rag" / "documents"
-)
+DOCUMENTS_DIR = BACKEND_DIR / "app" / "rag" / "documents"
 
 
 class RAGService:
 
     def __init__(self):
-
         self.embedding_service = EmbeddingService()
         self.vector_store = VectorStore()
-
-        if not settings.OPENAI_API_KEY:
-            raise ValueError("OPENAI_API_KEY is not configured.")
-
-        self.client = OpenAI(
-            api_key=settings.OPENAI_API_KEY,
-            timeout=settings.LLM_TIMEOUT_SECONDS
-        )
 
     def ingest_documents(self):
 
@@ -95,7 +81,8 @@ class RAGService:
     def generate_answer(
         self,
         question: str,
-        contexts: List[str]
+        contexts: List[str],
+        provider: str = "openai"
     ):
 
         if not contexts:
@@ -106,7 +93,20 @@ class RAGService:
 
         context_text = "\n\n".join(contexts)
 
-        response = self.client.responses.create(
+        if provider == "mock":
+            return f"Mock response based on retrieved context: {context_text}"
+
+        if provider != "openai":
+            raise ValueError("Unsupported LLM provider.")
+
+        if not settings.OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY is not configured.")
+
+        client = OpenAI(
+            api_key=settings.OPENAI_API_KEY,
+            timeout=settings.LLM_TIMEOUT_SECONDS
+        )
+        response = client.responses.create(
             model=settings.OPENAI_MODEL,
             instructions=(
                 "You are a document question-answering assistant. "
@@ -126,7 +126,8 @@ class RAGService:
     def ask(
         self,
         question: str,
-        top_k: int = 3
+        top_k: int = 3,
+        provider: str = "openai"
     ):
 
         contexts = self.retrieve(
@@ -136,12 +137,14 @@ class RAGService:
 
         answer = self.generate_answer(
             question=question,
-            contexts=contexts
+            contexts=contexts,
+            provider=provider
         )
 
         return {
             "question": question,
             "answer": answer,
             "retrieved_context": contexts,
-            "retrieved_chunks": len(contexts)
+            "retrieved_chunks": len(contexts),
+            "provider": provider
         }

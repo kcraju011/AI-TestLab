@@ -9,17 +9,31 @@ from app.database import batch_persistence
 from app.database.schemas import TestRunCreate
 from app.routes import batch_routes
 from app.services import batch_runner as batch_module
+from app.core.paths import BACKEND_DIR
 
 
 client = TestClient(app)
+DEFAULT_REPORTS_DIR = batch_module.REPORTS_DIR
+
+
+def test_batch_paths_resolve_inside_backend():
+    assert batch_module.DATASET_PATH == (
+        BACKEND_DIR / "app" / "datasets" / "sample_dataset.json"
+    )
+    assert DEFAULT_REPORTS_DIR == BACKEND_DIR / "reports"
 
 
 @pytest.fixture(autouse=True)
-def mock_batch_database_save(monkeypatch):
+def isolate_batch_side_effects(tmp_path, monkeypatch):
     monkeypatch.setattr(
         batch_routes,
         "save_batch_result",
         lambda db, result: SimpleNamespace(id=123)
+    )
+    monkeypatch.setattr(
+        batch_module,
+        "REPORTS_DIR",
+        tmp_path
     )
 
 
